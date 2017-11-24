@@ -1,0 +1,34 @@
+{
+  "name": "graphql-server",
+  "version": "1.0.0",
+  "description": "graphql-server",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.15.5",
+    "graphql": "^0.11.7",
+    "mongodb": "^2.2.33",
+    "morgan": "~1.9.0",
+    "pug": "2.0.0-beta11",
+    "serve-favicon": "~2.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaunzeng/web-app-server.git"
+  },
+  "author": "shaun zeng",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shaunzeng/web-app-server/issues"
+  },
+  "homepage": "https://github.com/shaunzeng/web-app-server#readme"
+}
