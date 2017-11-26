@@ -4,10 +4,11 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var { graphiqlExpress, graphqlExpress } = require('graphql-server-express');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
-var graphqlService = require('./graphql/graphqlService');
+var graphqlSchema = require('./graphql');
 
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
@@ -21,7 +22,7 @@ MongoClient.connect(url, function(err, db){
 	}
 
 	assert.equal(null, err);
-	console.log('connected to db');
+	console.log('connected to database');
 
 	db.close();
 })
@@ -36,14 +37,22 @@ app.set('view engine', 'pug');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
-app.use('/graphql', graphqlService);
+//app.use('/', index);
+//app.use('/users', users);
+app.use('/graphiql', graphiqlExpress({
+  endpointURL:'/graphql',
+}));
+
+app.use(
+  '/graphql', 
+  bodyParser.json(), 
+  graphqlExpress({ 
+    schema: graphqlSchema,
+  }));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

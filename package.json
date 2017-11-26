@@ -4,15 +4,21 @@
   "description": "graphql-server",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "nodemon bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "apollo-server-express": "^1.2.0",
+    "bcrypt": "^1.0.3",
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.15.5",
     "graphql": "^0.11.7",
+    "graphql-server-express": "^1.2.0",
+    "graphql-tools": "^2.8.0",
+    "jsonwebtoken": "^8.1.0",
+    "lodash": "^4.17.4",
     "mongodb": "^2.2.33",
     "morgan": "~1.9.0",
     "pug": "2.0.0-beta11",
