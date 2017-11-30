@@ -9,7 +9,7 @@ const Query = `
 
 const Mutation = `
 	type Mutation {
-		createUser (username: String!, first_name:String! ,last_name:String!, email:String!, phone:String!) : String!
+		createUser (username: String!, first_name:String! ,last_name:String!, email:String!, phone:String!, password:String!) : String!
 		updateUser (username: String!, password: String!, newPassword:String!) : User!
 	    deleteUser (username: String!) : Int!
 	    login(email: String!, password: String!): String!

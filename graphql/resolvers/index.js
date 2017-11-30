@@ -40,13 +40,16 @@ function createUser(parent, args, context, info){
 				console.log(user)
 				assert.equal(err, null);
 				user.password = hash;
+				user.testField = [1,2,3];
 
 				db
-				.collection('user')
-				.insert(args, function(err, doc){
-					assert(err, null);
+				.collection('users')
+				.insertOne(args)
+				.then(function(result){
+					console.log(result);
+					db.close();
 					resolve('fake token');
-				});
+				})
 			});	
 		});
 	});
@@ -76,6 +79,27 @@ function updateUser(parent, args, context, info) {
 
 
 
-function login(parent, agrs, context, info){
+function login(parent, args, context, info){
+	return new Promise(function(resolve, reject){
+		var email = args['email'];
+		var db = context.database;
 
-}
+		console.log(args);
+
+		db.open(function(err, db){
+			assert.equal(null, err);
+
+			db
+			.collection('users')
+			.findOne({'email': email}, function(err, result){
+				assert.equal(err, null);
+
+				bcrypt.compare(args['password'], result['password'], function(err, hash){
+					assert.equal(err, null);
+					db.close();
+					resolve('logged in');
+				})
+			});
+		});
+	});	  
+}   

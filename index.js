@@ -10,7 +10,6 @@ var graphqlSchema = require('./graphql');
 
 var db = require('./database');
 
-
 var app = express();
 
 // view engine setup
@@ -25,6 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const SECRET = 'HVe9FRlm0r';
 
 app.use(
   '/graphql', 
@@ -32,7 +32,8 @@ app.use(
   graphqlExpress({ 
     schema: graphqlSchema,
     context:{
-      database:db
+      database:db,
+      secret:SECRET
     }
   })
 );
