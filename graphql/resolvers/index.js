@@ -3,6 +3,10 @@ const getAllUsers = require('./getAllUsers.js');
 const assert = require('assert');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const PubSub = require('graphql-subscriptions').PubSub;
+
+const pubsub = new PubSub();
+const USER_ADDED = 'USER_ADDED';
 
 const resolvers = {
 	Query : {
@@ -21,6 +25,9 @@ const resolvers = {
 		//resetPassword(token: String!, newPassword: String!): Boolean
 		//sendVerificationEmail(email: String!): Boolean
 		//sendResetPasswordEmail(email: String!): Boolean
+	},
+	Subscription:{
+		userAdded: userAdded
 	}
 }
 
@@ -30,6 +37,7 @@ module.exports = resolvers;
 
 function createUser(parent, args, context, info){
 	return new Promise(function(resolve, reject){
+
 		var db = context.database;
 
 		db.open(function(err, db){
@@ -100,7 +108,7 @@ function login(parent, args, context, info){
 					db.close();
 
 					delete user['password'];
-					
+
 					const token = jwt.sign({
 						me:user
 					}, context.secret,{
@@ -115,3 +123,16 @@ function login(parent, args, context, info){
 }   
 
 //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJteW5hbWUiOiJoZWxsb2tpdHR5QGdtYWlsLmNvbSIsImlhdCI6MTUxMjAxODk1NiwiZXhwIjoxNTQzNTc2NTU2fQ.iw8PoCVWGo8d510E4C0hSyrPDyTIO3n4FNn6M1tqXog
+
+
+function userAdded(){
+	return pubsub.asyncIterator(USER_ADDED);
+}
+
+var count = 0;
+
+
+setInterval(function(){
+	pubsub.publish(USER_ADDED,{userAdded:{id:count++}});
+	console.log('published ..', count);
+}, 800);

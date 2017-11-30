@@ -16,13 +16,15 @@
     "express": "~4.15.5",
     "graphql": "^0.11.7",
     "graphql-server-express": "^1.2.0",
+    "graphql-subscriptions": "^0.5.5",
     "graphql-tools": "^2.8.0",
     "jsonwebtoken": "^8.1.0",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.33",
     "morgan": "~1.9.0",
     "pug": "2.0.0-beta11",
-    "serve-favicon": "~2.4.5"
+    "serve-favicon": "~2.4.5",
+    "subscriptions-transport-ws": "^0.9.1"
   },
   "devDependencies": {
     "nodemon": "^1.12.1"

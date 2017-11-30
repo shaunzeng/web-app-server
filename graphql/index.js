@@ -5,7 +5,7 @@ const resolvers = require('./resolvers');
 
 const graphqlSchema = makeExecutableSchema({
 	typeDefs:schema,
-	resolvers:resolvers
+	resolvers:resolvers,
 })
 
 module.exports = graphqlSchema;

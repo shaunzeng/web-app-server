@@ -1,10 +1,31 @@
-const User = require('./user.js');
+const Subscription = `
+
+	type Subscription {
+	    userAdded: Result!
+	}
+
+	type Result {
+		id: Int!
+	}
+`;
 
 const Query = `
+
+	type User {
+		username: String
+		password: String
+		first_name: String
+		last_name: String
+		email: String
+		phone: String
+		role: String
+	}
+
 	type Query {
 		getAllUsers: [User!]!
 		getUser: User
 	}
+
 `;
 
 const Mutation = `
@@ -23,7 +44,15 @@ const Mutation = `
 	}
 `;
 
+const Schema = `
+	schema {
+		query: Query
+		mutation: Mutation
+		subscription: Subscription
+	}
+`;
 
 
 
-module.exports = [Mutation, Query, User];
+
+module.exports = [Schema, Mutation, Query, Subscription];
