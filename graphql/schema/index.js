@@ -3,7 +3,7 @@ const User = require('./user.js');
 const Query = `
 	type Query {
 		getAllUsers: [User!]!
-		getUser(username: String!): User
+		getUser: User
 	}
 `;
 

@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var jwt = require('jsonwebtoken');
 
 var { graphiqlExpress, graphqlExpress } = require('graphql-server-express');
 var graphqlSchema = require('./graphql');
@@ -25,16 +26,31 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const SECRET = 'HVe9FRlm0r';
+app.use(function(req, res, next){
+  var token = req.headers.authorization;
+
+  try{
+    var me = jwt.verify(token, SECRET);
+    req.user = me;
+  } catch(err) {
+    console.log(err);
+  }
+  
+  req.next();
+})
 
 app.use(
   '/graphql', 
   bodyParser.json(), 
-  graphqlExpress({ 
-    schema: graphqlSchema,
-    context:{
-      database:db,
-      secret:SECRET
-    }
+  graphqlExpress(function(req, res){
+    return { 
+      schema: graphqlSchema,
+      context:{
+          database:db,
+          secret:SECRET,
+          user:req.user
+        }
+      }
   })
 );
 

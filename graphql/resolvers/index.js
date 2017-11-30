@@ -2,6 +2,7 @@ const getUser = require('./getUser.js');
 const getAllUsers = require('./getAllUsers.js');
 const assert = require('assert');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const resolvers = {
 	Query : {
@@ -91,15 +92,26 @@ function login(parent, args, context, info){
 
 			db
 			.collection('users')
-			.findOne({'email': email}, function(err, result){
+			.findOne({'email': email}, function(err, user){
 				assert.equal(err, null);
 
-				bcrypt.compare(args['password'], result['password'], function(err, hash){
+				bcrypt.compare(args['password'], user['password'], function(err, hash){
 					assert.equal(err, null);
 					db.close();
-					resolve('logged in');
+
+					delete user['password'];
+					
+					const token = jwt.sign({
+						me:user
+					}, context.secret,{
+						expiresIn:'1y'
+					});
+
+					resolve(token);
 				})
 			});
 		});
 	});	  
 }   
+
+//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJteW5hbWUiOiJoZWxsb2tpdHR5QGdtYWlsLmNvbSIsImlhdCI6MTUxMjAxODk1NiwiZXhwIjoxNTQzNTc2NTU2fQ.iw8PoCVWGo8d510E4C0hSyrPDyTIO3n4FNn6M1tqXog
