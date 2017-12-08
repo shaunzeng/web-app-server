@@ -6,12 +6,14 @@ const jwt = require('jsonwebtoken');
 const PubSub = require('graphql-subscriptions').PubSub;
 
 const pubsub = new PubSub();
+console.log(pubsub.asyncIterator, ' pubsub');
 const USER_ADDED = 'USER_ADDED';
 
 const resolvers = {
 	Query : {
 		getAllUsers: getAllUsers,
 		getUser: getUser,
+
 	},
 	Mutation: {
 		createUser: createUser,
@@ -27,7 +29,9 @@ const resolvers = {
 		//sendResetPasswordEmail(email: String!): Boolean
 	},
 	Subscription:{
-		userAdded: userAdded
+		userAdded: {
+			subscribe: function(){ return pubsub.asyncIterator(USER_ADDED)}
+		}
 	}
 }
 
@@ -132,7 +136,9 @@ function userAdded(){
 var count = 0;
 
 
+/*
 setInterval(function(){
 	pubsub.publish(USER_ADDED,{userAdded:{id:count++}});
 	console.log('published ..', count);
 }, 800);
+*/

@@ -10,7 +10,7 @@ var { graphiqlExpress, graphqlExpress } = require('graphql-server-express');
 var graphqlSchema = require('./graphql');
 
 var db = require('./database');
-
+console.log('db ready ?? ', typeof db);
 var app = express();
 
 // view engine setup
@@ -27,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const SECRET = 'HVe9FRlm0r';
 app.use(function(req, res, next){
+  /*
   var token = req.headers.authorization;
 
   try{
@@ -35,7 +36,7 @@ app.use(function(req, res, next){
   } catch(err) {
     console.log(err);
   }
-  
+  */
   req.next();
 })
 
