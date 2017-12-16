@@ -78,9 +78,7 @@ const resolvers = {
 	  },
 	Post: { 
 	    author: postAuthor,
-	    comments:({id}, args, context) =>{ 
-	    	console.log('request comments');
-	     return	postLoader.load(id)},
+	    comments:({id}, args, context) => postLoader.load(id),
 	},
 	Comment: {
 	    author: commentAuthor
