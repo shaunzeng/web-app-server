@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken');
+var DataLoader = require('DataLoader');
 
 var { graphiqlExpress, graphqlExpress } = require('graphql-server-express');
 var graphqlSchema = require('./graphql');
@@ -40,6 +41,7 @@ app.use(function(req, res, next){
   req.next();
 })
 
+
 app.use(
   '/graphql', 
   bodyParser.json(), 
@@ -49,7 +51,7 @@ app.use(
       context:{
           database:db,
           secret:SECRET,
-          user:req.user
+          user:req.user,
         }
       }
   })

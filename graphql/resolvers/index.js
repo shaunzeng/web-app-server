@@ -4,15 +4,54 @@ const assert = require('assert');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const PubSub = require('graphql-subscriptions').PubSub;
+const createUser = require('./createUser.js');
+const updateUser = require('./updateUser.js');
+const login = require('./login.js');
+const {filter, find} = require('lodash');
+const DataLoader = require('dataloader');
+const {authors, posts, comments} = require('../../database/test.js');
+
+
+
+
+var postLoader = new DataLoader(keys => {
+	console.log('run here');
+	var pro = new Promise(function(resolve, reject) {
+		var collection = [];
+
+		keys.forEach((val, idx) => {
+			console.log(val);
+			console.log(' ');
+			var comment = filter(comments, {'postId': val});
+			console.log(comment);
+			console.log(' ' );
+
+			collection.push(comment);
+		})
+
+		console.log('found comments ', collection);
+		resolve(collection);
+	});
+
+	return pro
+});
+
+
 
 const pubsub = new PubSub();
 console.log(pubsub.asyncIterator, ' pubsub');
 const USER_ADDED = 'USER_ADDED';
 
+
+
+
 const resolvers = {
 	Query : {
 		getAllUsers: getAllUsers,
 		getUser: getUser,
+		posts: getPosts,
+	    author: getAuthor,
+	    comments:getComments
 
 	},
 	Mutation: {
@@ -27,11 +66,32 @@ const resolvers = {
 		//resetPassword(token: String!, newPassword: String!): Boolean
 		//sendVerificationEmail(email: String!): Boolean
 		//sendResetPasswordEmail(email: String!): Boolean
+		 upvotePost: (_, { postId }) => {
+	      const post = find(posts, { id: postId });
+	      if (!post) {
+	        throw new Error(`Couldn't find post with id ${postId}`);
+	      }
+	      post.votes += 1;
+	      return post;
+	    },
 	},
 	Subscription:{
 		userAdded: {
 			subscribe: function(){ return pubsub.asyncIterator(USER_ADDED)}
 		}
+	},
+	Author: {
+	   // posts: (author) => filter(posts, { authorId: author.id }),
+	   posts:authorPosts,
+	  },
+	Post: { 
+	    author: postAuthor,
+	    comments:({id}, args, context) =>{ 
+	    	console.log('request comments');
+	     return	postLoader.load(id)},
+	},
+	Comment: {
+	    author: commentAuthor
 	}
 }
 
@@ -39,92 +99,42 @@ const resolvers = {
 module.exports = resolvers;
 
 
-function createUser(parent, args, context, info){
-	return new Promise(function(resolve, reject){
-
-		var db = context.database;
-
-		db.open(function(err, db){
-			assert.equal(err, null);
-
-			var user = args;
-
-			bcrypt.hash(user.password, 12, function(err, hash){
-				console.log(user)
-				assert.equal(err, null);
-				user.password = hash;
-				user.testField = [1,2,3];
-
-				db
-				.collection('users')
-				.insertOne(args)
-				.then(function(result){
-					console.log(result);
-					db.close();
-					resolve('fake token');
-				})
-			});	
-		});
-	});
+function getPosts(){
+	console.log('get all posts');
+	return posts;
 }
 
-
-function updateUser(parent, args, context, info) {
-	return new Promise(function(resolve, reject){
-		var db = context.database;
-
-		db.open(function(err, db){
-			assert.equal(err, null);
-
-			db
-			.collection('user')
-			.update(
-				{'username':'shaunzeng'}, 
-				{$set:{'phone':0000000000}},
-				function(err, result){
-					db.close();
-					resolve(result);
-				});
-		});
-	})
+function getAuthor(parent, args) {
+	console.log('get author');
+	return find(authors, {id:args.id});
 }
 
+function getComments(parent, args){
+	console.log('get Comments');
+	return find(comments, {postId: args.postid});
+}
 
+function authorPosts(author){
+	console.log('author post');
+	return filter(posts, {authorId: author.id});
+}
 
+function postAuthor(post) {
+	console.log('post author');
+	return find(authors, {id: post.authorId});
+}
 
-function login(parent, args, context, info){
-	return new Promise(function(resolve, reject){
-		var email = args['email'];
-		var db = context.database;
+function postComments(post) {
+	console.log('post comments');
+	return filter(comments, {postId:post.id});
+}
 
-		console.log(args);
+function commentAuthor(comment) {
+	console.log('comment author');
+	return find(authors,{id:comment.postId});
+}
 
-		db.open(function(err, db){
-			assert.equal(null, err);
-
-			db
-			.collection('users')
-			.findOne({'email': email}, function(err, user){
-				assert.equal(err, null);
-
-				bcrypt.compare(args['password'], user['password'], function(err, hash){
-					assert.equal(err, null);
-					db.close();
-
-					delete user['password'];
-
-					const token = jwt.sign({
-						me:user
-					}, context.secret,{
-						expiresIn:'1y'
-					});
-
-					resolve(token);
-				})
-			});
-		});
-	});	  
-}   
+  
 
 //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJteW5hbWUiOiJoZWxsb2tpdHR5QGdtYWlsLmNvbSIsImlhdCI6MTUxMjAxODk1NiwiZXhwIjoxNTQzNTc2NTU2fQ.iw8PoCVWGo8d510E4C0hSyrPDyTIO3n4FNn6M1tqXog
 

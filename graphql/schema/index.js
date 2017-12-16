@@ -23,7 +23,34 @@ const Query = `
 
 	type Query {
 		getAllUsers: [User!]!
-		getUser: User
+		getUser: User,
+
+		posts: [Post]
+    	author(id: Int!): Author
+		comments(postid: Int!): [Comment]
+	}
+
+
+	type Author {
+	    id: Int!
+	    firstName: String
+	    lastName: String
+	    posts: [Post] # the list of Posts by this author
+	}
+
+	type Comment {
+		id: Int!
+		title: String
+		author: Author!
+		post: Post
+	}
+
+    type Post {
+	    id: Int!
+	    title: String
+	    author: Author
+	    votes: Int
+		comments: [Comment]
 	}
 
 `;
@@ -41,6 +68,7 @@ const Mutation = `
 		resetPassword: Boolean
 		sendVerificationEmail: Boolean
 		sendResetPasswordEmail: Boolean
+		upvotePost ( postId: Int!): Post
 	}
 `;
 
