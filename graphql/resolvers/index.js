@@ -15,21 +15,13 @@ const {authors, posts, comments} = require('../../database/test.js');
 
 
 var postLoader = new DataLoader(keys => {
-	console.log('run here');
 	var pro = new Promise(function(resolve, reject) {
 		var collection = [];
 
 		keys.forEach((val, idx) => {
-			console.log(val);
-			console.log(' ');
 			var comment = filter(comments, {'postId': val});
-			console.log(comment);
-			console.log(' ' );
-
 			collection.push(comment);
 		})
-
-		console.log('found comments ', collection);
 		resolve(collection);
 	});
 
